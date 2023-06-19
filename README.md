@@ -21,6 +21,9 @@ idf.py build flash monitor
 
 idf.py save-defconfig     
 
+openssl genrsa -out ./secrets/secure_boot_signing_key.pem 3072
+idf.py bootloader
+
 ```
 
 
