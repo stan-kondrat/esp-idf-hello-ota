@@ -11,6 +11,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 #include "led.h"
+#include "wifi.h"
 
 static const char *TAG = "MAIN";
 
@@ -23,4 +24,6 @@ void app_main(void)
 
     /* Start blinking */
     xTaskCreate(led_task, "led_task", 4096, NULL, 10, NULL);
+
+    wifi_init();
 }
