@@ -1,0 +1,50 @@
+name: SonarCloud
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  build:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+    env:
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis     
+      - name: Install sonar-scanner and build-wrapper
+        uses: SonarSource/sonarcloud-github-c-cpp@v1
+      - name: Save sonar env vars
+        run: |
+          printenv && \
+          cat <<EOT >> sonar.env
+          SONAR_HOST_URL=$SONAR_HOST_URL
+          SONAR_SCANNER_DIR=$SONAR_SCANNER_DIR
+          SONAR_SCANNER_BIN=$SONAR_SCANNER_BIN
+          BUILD_WRAPPER_DIR=$BUILD_WRAPPER_DIR
+          BUILD_WRAPPER_BIN=$BUILD_WRAPPER_BIN
+          SONAR_SCANNER_BIN_DIR=$SONAR_SCANNER_DIR/bin
+          BUILD_WRAPPER_BIN_DIR=$BUILD_WRAPPER_DIR
+          EOT
+      - name: Run build-wrapper with ESP-IDF
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.0.2
+          target: esp32s2
+          path: './' 
+          command: |
+            cat sonar.env && \
+            ls -la && \
+            set -a; source sonar.env; set +a; \
+            printenv && \
+            $SONAR_SCANNER_DIR/build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} idf.py build
+      - name: Run sonar-scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
