@@ -21,12 +21,12 @@ jobs:
     - name: Rename artifact
       run: |
         ls -lah 
-        cp ./build/hello.bin hello.bin
+        cp ./build/main.bin firmware.bin
     - name: Archive Firmware Files
       uses: actions/upload-artifact@v3
       with: 
-        name: hello-firmware
-        path: "hello.bin"
+        name: firmware
+        path: "firmware.bin"
 
   release:
     needs: build
