@@ -1,10 +1,12 @@
 #pragma once
 
+#include "esp_http_server.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void wifi_init_sta(void);
+void web_server_start(void);
 
 #ifdef __cplusplus
 }

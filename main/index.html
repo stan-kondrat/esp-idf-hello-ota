@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>ESP OTA Github Example</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        label span {
+            width: 100px;
+            display: inline-block;
+        }
+        label input {
+            width: 200px;
+        }
+        input[name="submit"] {
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <form method="post" action="/update">
+        <h1>
+            ESP OTA Github Example
+            <br />
+            <span style="font-size: 16px; color: #999;">https://github.com/stan-kondrat/esp-ota-github-example</span>
+        </h1>
+        <div style="background-color: #eed; margin: 0 -6px; padding: 1px 6px;">
+            <h3>Example config <i>ota_github_config_t</i></h3>
+            <p>
+                <label>
+                    <span>Github User</span>
+                    <input name="github_user" onchange="load()" size="64" value="stan-kondrat">
+                </label>
+                <br />
+                <label>
+                    <span>Github Repo</span>
+                    <input name="github_repo" onchange="load()" size="64" value="esp-ota-github-example">
+                </label>
+                <br />
+                <label>
+                    <span>File Name</span>
+                    <input name="filename" onchange="load()" size="64" value="firmware.bin">
+                </label>
+                <br />
+                <label>
+                    <span>Version</span>
+                    <input name="version" onchange="load()" size="64">
+                </label>
+                <br />
+                <label>
+                    <span>Latest</span>
+                    <input name="latest" type="checkbox" id="latest" onchange="load()">
+                </label>
+                <br />
+                <label>
+                    <span>Newer</span>
+                    <input name="newer" type="checkbox" id="newer" onchange="load()" disabled>
+                </label>
+                <br />
+                <label>
+                    <span>Pre release</span>
+                    <input name="prerelease" type="checkbox" id="prerelease" onchange="load()">
+                </label>
+            </p>
+        </div>
+        <h3>Available releases</h3>
+        <p>
+            Current Firmware Version:
+            <span id="appVersion" style="font-weight: bold;">
+                <span style="color: #999;">loading...</span>
+            </span>
+        </p>
+        <p>
+            <label>
+                <select name="release_id" disabled></select>
+            </label>
+        </p>
+        <p>
+            <input name="submit" type="submit" value="Update firmware">
+        </p>
+    </form>
+
+    <script>
+
+
+        const appVersion = document.getElementById("appVersion");
+        const github_user = document.querySelector('[name="github_user"]');
+        const github_repo = document.querySelector('[name="github_repo"]');
+        const filename = document.querySelector('[name="filename"]');
+        const version = document.querySelector('[name="version"]');
+        const newer = document.querySelector('[name="newer"]');
+        const latest = document.querySelector('[name="latest"]');
+        const prerelease = document.querySelector('[name="prerelease"]');
+        const releasesSelect = document.querySelector('[name="release_id"]');
+        const updateButton = document.querySelector('[name="submit"]');
+
+        function load() {
+            prerelease.disabled = latest.checked
+            if (latest.checked) {
+                prerelease.checked = false;
+            }
+            newer.disabled = !version.value;
+            if (newer.disabled) {
+                newer.checked = false;
+            }
+
+            const queryParams = {
+                github_user: github_user.value,
+                github_repo: github_repo.value,
+                filename: filename.value,
+                version: version.value,
+                latest: latest.checked,
+                newer: newer.checked,
+                prerelease: prerelease.checked,
+            };
+            fetch("/api?" + new URLSearchParams(queryParams))
+                .then(response => response.json()).then(jsonData => {
+                    version.value = version.value || jsonData.current_version
+                    newer.disabled = !version.value;
+                    appVersion.innerText = jsonData.current_version;
+                    releasesSelect.innerHTML = "";
+                    releasesSelect.disabled = jsonData.releases.length == 0;
+                    updateButton.disabled = jsonData.releases.length == 0;
+                    jsonData.releases.map(release => {
+                        const option = document.createElement("option");
+                        option.value = release.id;
+                        option.innerHTML = `${release.tag_name} - ${release.name} (${release.created_at})`;
+                        releasesSelect.append(option);
+                    });
+                });
+        }
+        load();
+    </script>
+</body>
+
+</html>

@@ -26,6 +26,20 @@ idf.py bootloader
 
 ```
 
+## Github Releases API
+
+```sh
+curl -L \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  https://api.github.com/repos/stan-kondrat/esp-ota-github-example/releases
+
+curl -L \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  https://api.github.com/repos/stan-kondrat/esp-ota-github-example/releases/latest
+```
+
 ## Logs
 
 ```sh
