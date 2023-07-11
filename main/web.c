@@ -153,9 +153,7 @@ static esp_err_t update_post_handler(httpd_req_t *req) {
     httpd_resp_send_chunk(req, (char*)releases->releases[0].download_url, sizeof(releases->releases[0].download_url));
     ESP_LOGI(TAG, "%s %s \n", help_download, releases->releases[0].download_url);
 
-    ota_config_t ota_config = {0};
-    strncpy((char *)ota_config.url, (char *)releases->releases[0].download_url, 256);
-    ota_install(ota_config);
+    ota_install(releases->releases[0].download_url);
 
     char help_updating[] = "<pre>Updating...\n";
     httpd_resp_send_chunk(req, help_updating, sizeof(help_updating));
