@@ -6,12 +6,12 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
-#include <stdio.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "led_strip.h"
+#include <stdio.h>
 
 static const char *TAG = "LED";
 
@@ -24,8 +24,7 @@ static uint8_t s_led_state = 0;
 
 static led_strip_handle_t led_strip;
 
-void blink_led(void)
-{
+void blink_led(void) {
     /* If the addressable LED is enabled */
     if (s_led_state) {
         /* Set the LED pixel using RGB from 0 (0%) to 255 (100%) for each color */
@@ -38,8 +37,7 @@ void blink_led(void)
     }
 }
 
-void configure_led(void)
-{
+void configure_led(void) {
     ESP_LOGI(TAG, "Example configured to blink addressable LED!");
     /* LED strip initialization with the GPIO and pixels number*/
     led_strip_config_t strip_config = {
@@ -54,8 +52,7 @@ void configure_led(void)
     led_strip_clear(led_strip);
 }
 
-void led_task(void *arg)
-{
+void led_task(void *arg) {
     while (1) {
         ESP_LOGI(TAG, "Turning the LED %s!", s_led_state == true ? "ON" : "OFF");
         blink_led();

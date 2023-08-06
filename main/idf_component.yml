@@ -4,6 +4,10 @@ dependencies:
     version: ">=5"
   espressif/led_strip: "*"
   ota-github-esp-component:
-    version: v0.1.0
+    version: v0.2.0
     path: .
     git: https://github.com/stan-kondrat/ota-github-esp-component.git
+
+  # # For Development
+  # ota-github-esp-component:
+  #   path: ../../ota-github-esp-component/
